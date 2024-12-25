@@ -1,0 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+}
+
+html,
+body,
+#root,
+.app,
+.content {
+  height: 100%;
+  width: 100%;
+}
+
+.app {
+  background-image: url("/public/imgs/bg.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  position: relative;
+}
