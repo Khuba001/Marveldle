@@ -1,7 +1,11 @@
-function GameButton({ text, bgColor }) {
+function GameButton({ text, bgColor, onClick }) {
   return (
     <div className="button-container">
-      <button className="game-button" style={{ backgroundColor: bgColor }}>
+      <button
+        onClick={onClick}
+        className="game-button"
+        style={{ backgroundColor: bgColor }}
+      >
         {text}
       </button>
     </div>

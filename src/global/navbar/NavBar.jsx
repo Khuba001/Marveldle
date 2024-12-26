@@ -1,4 +1,4 @@
-function NavBar() {
+function NavBar({ gameOn, setGameOn }) {
   return (
     <div className="navbar">
       <img
@@ -7,6 +7,7 @@ function NavBar() {
         src="
       ./imgs/logo.png"
         alt="marvel logo"
+        onClick={() => setGameOn(false)}
       />
       <span>
         <svg

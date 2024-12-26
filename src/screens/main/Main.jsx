@@ -1,11 +1,21 @@
+import { useState } from "react";
 import GameButton from "../../components/gamebutton/GameButton";
 
-function Main() {
+function Main({ gameOn, setGameOn }) {
+  function playGame() {
+    setGameOn(true);
+  }
   return (
     <div className="main">
-      <h2 className="header">Guess Marvel Characters</h2>
-      <GameButton text={"Heroes"} bgColor={"#c6383f"} />
-      <GameButton text={"Villians"} bgColor={"#311141"} />
+      {!gameOn ? (
+        <div>
+          <h2 className="header">Guess Marvel Characters</h2>
+          <GameButton onClick={playGame} text={"Heroes"} bgColor={"#c6383f"} />
+          <GameButton text={"Villians"} bgColor={"#311141"} />{" "}
+        </div>
+      ) : (
+        <div>da</div>
+      )}
     </div>
   );
 }
