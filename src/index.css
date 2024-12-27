@@ -44,10 +44,18 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 10rem;
+  margin-top: 5rem;
+  flex-direction: column;
+  margin-bottom: 2rem;
 }
+
+.langauge-btn {
+  cursor: pointer;
+}
+
 .logo {
   transition: all 0.3s;
+  cursor: pointer;
 }
 .logo:hover {
   transform: scale(105%);
@@ -75,4 +83,61 @@ body,
 .header {
   margin-bottom: 16px;
   color: #fff;
+}
+
+/* Game */
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guess-player-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.input-guess {
+  padding: 16px 32px;
+  border: 1px solid #e73c7e;
+  border-radius: 3px;
+}
+.btn-guess {
+  padding: 16px 16px;
+  background-color: #fff;
+  border: 1px solid #e73c7e;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.guess-rows {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: center;
+  justify-items: center;
+  margin-bottom: 16px;
+}
+
+.img {
+  width: 128px;
+  height: 128px;
+}
+
+.row-header {
+  color: #fff;
+  font-weight: 700;
+}
+.row-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #fff;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  background-color: #e73c7e;
 }

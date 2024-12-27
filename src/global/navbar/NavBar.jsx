@@ -1,16 +1,9 @@
 function NavBar({ gameOn, setGameOn }) {
   return (
     <div className="navbar">
-      <img
-        className="logo"
-        style={{ width: "75%" }}
-        src="
-      ./imgs/logo.png"
-        alt="marvel logo"
-        onClick={() => setGameOn(false)}
-      />
       <span>
         <svg
+          className="langauge-btn"
           xmlns="http://www.w3.org/2000/svg"
           width="32"
           height="32"
@@ -71,6 +64,14 @@ function NavBar({ gameOn, setGameOn }) {
           ></path>
         </svg>
       </span>
+      <img
+        className="logo"
+        style={{ width: "75%" }}
+        src="
+      ./imgs/logo.png"
+        alt="marvel logo"
+        onClick={() => setGameOn(false)}
+      />
     </div>
   );
 }
