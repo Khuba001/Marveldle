@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import md5 from "md5";
 import GameButton from "../../components/gamebutton/GameButton";
 
 function Main({ gameOn, setGameOn }) {
@@ -40,6 +41,23 @@ function Game({ guess, setGuess }) {
     setGuess((guess) => [...guess, answear]);
     setAnswear("");
   }
+
+  const ts = Date.now().toString();
+  console.log(ts);
+  const hash = md5(
+    ts + process.env.REACT_APP_PRIVATE_KEY + process.env.REACT_APP_PUBLIC_KEY
+  );
+
+  useEffect(function () {
+    async function fetchAPI() {
+      const res = await fetch(
+        ` https://gateway.marvel.com:443/v1/public/characters?name=Spider-Man&ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
+      );
+      const data = await res.json();
+      console.log(data);
+    }
+    fetchAPI();
+  }, []);
 
   return (
     <div className="game">
