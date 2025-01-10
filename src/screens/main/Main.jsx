@@ -51,9 +51,9 @@ function Game({ guess, setGuess }) {
   useEffect(function () {
     async function fetchAPI() {
       const res = await fetch(
-        ` https://gateway.marvel.com:443/v1/public/characters?name=Spider-Man&ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
+        ` https://gateway.marvel.com:443/v1/public/characters?ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
       );
-      const data = await res.json();
+      const { data } = await res.json();
       console.log(data);
     }
     fetchAPI();
