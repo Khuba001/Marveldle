@@ -4,7 +4,7 @@ import GameButton from "../../components/gamebutton/GameButton";
 
 function Main({ gameOn, setGameOn }) {
   // this state is responsible for guesses with each guess it increases by 1 and adds another row
-  const [guess, setGuess] = useState(["batmna", "sierla"]);
+  const [guessArray, setGuessArray] = useState(["batmna", "sierla"]);
   function playGame() {
     setGameOn(true);
   }
@@ -13,7 +13,7 @@ function Main({ gameOn, setGameOn }) {
       {!gameOn ? (
         <Menu onClick={playGame} />
       ) : (
-        <Game guess={guess} setGuess={setGuess} />
+        <Game guessArray={guessArray} setGuessArray={setGuessArray} />
       )}
     </div>
   );
@@ -31,15 +31,15 @@ function Menu({ onClick }) {
   );
 }
 
-function Game({ guess, setGuess }) {
-  const [answear, setAnswear] = useState("");
+function Game({ guessArray, setGuessArray }) {
+  const [query, setQuery] = useState("");
   function handleChange(e) {
-    setAnswear(e.target.value);
+    setQuery(e.target.value);
   }
 
   function handleSubmit() {
-    setGuess((guess) => [...guess, answear]);
-    setAnswear("");
+    setGuessArray((guesses) => [...guesses, query]);
+    setQuery("");
   }
 
   const ts = Date.now().toString();
@@ -63,7 +63,7 @@ function Game({ guess, setGuess }) {
     <div className="game">
       <div className="guess-player-container">
         <input
-          value={answear}
+          value={query}
           onChange={handleChange}
           className="input-guess"
           type="text"
@@ -72,14 +72,14 @@ function Game({ guess, setGuess }) {
           Guess
         </button>
       </div>
-      {guess.map((guess) => (
-        <GuessRow guess={guess} key={crypto.randomUUID()} />
+      {guessArray.map((guess) => (
+        <GuessRow guessArray={guessArray} key={crypto.randomUUID()} />
       ))}
     </div>
   );
 }
 
-function GuessRow({ guess }) {
+function GuessRow({ guessArray }) {
   // the guess prop will be compared to the answear
   return (
     <div className="guess-rows">
