@@ -53,16 +53,15 @@ function Game({ guessArray, setGuessArray }) {
       async function fetchAPI() {
         try {
           const res = await fetch(
-            ` https://gateway.marvel.com:443/v1/public/characters?name=${query}&ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
+            `https://gateway.marvel.com/v1/public/characters?ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
           );
 
           if (!res.ok)
             throw new Error("Something went wrong with fetching characters!");
-          const data = await res.json();
+          const { data } = await res.json();
           if (data.Response === "False")
             throw new Error("Character not found!");
-          console.log(data.results[0]);
-          setGuessedCharacter(data.results[0]);
+          console.log(data);
         } catch (error) {
           console.error(error);
         }
