@@ -33,6 +33,7 @@ function Menu({ onClick }) {
 
 function Game({ guessArray, setGuessArray }) {
   const [query, setQuery] = useState("");
+  const [guessedCharacter, setGuessedCharacter] = useState(null);
   function handleChange(e) {
     setQuery(e.target.value);
   }
@@ -43,21 +44,34 @@ function Game({ guessArray, setGuessArray }) {
   }
 
   const ts = Date.now().toString();
-  console.log(ts);
   const hash = md5(
     ts + process.env.REACT_APP_PRIVATE_KEY + process.env.REACT_APP_PUBLIC_KEY
   );
 
-  useEffect(function () {
-    async function fetchAPI() {
-      const res = await fetch(
-        ` https://gateway.marvel.com:443/v1/public/characters?ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
-      );
-      const { data } = await res.json();
-      console.log(data);
-    }
-    fetchAPI();
-  }, []);
+  useEffect(
+    function () {
+      async function fetchAPI() {
+        try {
+          const res = await fetch(
+            ` https://gateway.marvel.com:443/v1/public/characters?name=${query}&ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
+          );
+
+          if (!res.ok)
+            throw new Error("Something went wrong with fetching characters!");
+          const data = await res.json();
+          if (data.Response === "False")
+            throw new Error("Character not found!");
+          console.log(data.results[0]);
+          setGuessedCharacter(data.results[0]);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      fetchAPI();
+      // setGuessArray();
+    },
+    [query]
+  );
 
   return (
     <div className="game">
@@ -73,13 +87,18 @@ function Game({ guessArray, setGuessArray }) {
         </button>
       </div>
       {guessArray.map((guess) => (
-        <GuessRow guessArray={guessArray} key={crypto.randomUUID()} />
+        <GuessRow
+          guessArray={guessArray}
+          guess={guess}
+          guessedCharacter={guessedCharacter}
+          key={crypto.randomUUID()}
+        />
       ))}
     </div>
   );
 }
 
-function GuessRow({ guessArray }) {
+function GuessRow({ guessArray, guessedCharacter }) {
   // the guess prop will be compared to the answear
   return (
     <div className="guess-rows">
@@ -91,7 +110,7 @@ function GuessRow({ guessArray }) {
       <div className="row-header">Origin</div>
       <div className="row-header">Apparition year</div>
       <img
-        src="public\imgs\logo.png"
+        src={`${guessedCharacter?.thumbnail?.path}.${guessedCharacter?.thumbnail?.extension}`}
         alt="character portrait"
         className="img"
       />
