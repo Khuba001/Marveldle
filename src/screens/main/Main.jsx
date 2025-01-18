@@ -41,6 +41,7 @@ function Game({ guessArray, setGuessArray }) {
   function handleSubmit() {
     setGuessArray((guesses) => [...guesses, query]);
     setQuery("");
+    console.log(guessArray); // nie dodaje się
   }
 
   const ts = Date.now().toString();
@@ -53,7 +54,7 @@ function Game({ guessArray, setGuessArray }) {
       async function fetchAPI() {
         try {
           const res = await fetch(
-            `https://gateway.marvel.com/v1/public/characters?ts=${ts}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
+            `https://gateway.marvel.com/v1/public/characters?ts=${ts}&nameStartsWith=${query}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
           );
 
           if (!res.ok)
@@ -62,12 +63,16 @@ function Game({ guessArray, setGuessArray }) {
           if (data.Response === "False")
             throw new Error("Character not found!");
           console.log(data);
+          setGuessedCharacter(data.results[0]);
         } catch (error) {
           console.error(error);
         }
       }
+      if (query.length < 3) {
+        setGuessedCharacter(null);
+        return;
+      }
       fetchAPI();
-      // setGuessArray();
     },
     [query]
   );
