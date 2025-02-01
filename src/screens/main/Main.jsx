@@ -34,12 +34,17 @@ function Menu({ onClick }) {
 function Game({ guessArray, setGuessArray }) {
   const [query, setQuery] = useState("");
   const [guessedCharacter, setGuessedCharacter] = useState(null);
+
   function handleChange(e) {
     setQuery(e.target.value);
   }
 
   function handleSubmit() {
-    setGuessArray((guesses) => [...guesses, query]);
+    if (query.length < 3) {
+      return;
+    }
+    if (!guessArray.includes(`${query}`))
+      setGuessArray((guesses) => [...guesses, query]);
     setQuery("");
     console.log(guessArray); // nie dodaje się
   }
@@ -62,16 +67,15 @@ function Game({ guessArray, setGuessArray }) {
           const { data } = await res.json();
           if (data.Response === "False")
             throw new Error("Character not found!");
-          console.log(data);
+          if (!data.results.length) throw new Error("Character not found!");
+
+          // console.log(data);
           setGuessedCharacter(data.results[0]);
         } catch (error) {
           console.error(error);
         }
       }
-      if (query.length < 3) {
-        setGuessedCharacter(null);
-        return;
-      }
+
       fetchAPI();
     },
     [query]
