@@ -206,7 +206,7 @@ function GuessRow({ guess, correctCharacterToday }) {
   function determineKekkeiGenkai(character) {
     if (!character?.personal?.kekkeiGenkai?.length) return "None";
     if (
-      character?.personal?.kekkeiGenkai.some((jutsu) =>
+      character?.personal?.kekkeiGenkai?.some((jutsu) =>
         dojutsuKekkeiGenkai.includes(jutsu)
       )
     )

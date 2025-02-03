@@ -7,7 +7,7 @@ function App() {
 
   return (
     <div className="app">
-      <div className="gradient"></div>
+      <div></div>
       <div className="content">
         {" "}
         <NavBar gameOn={gameOn} setGameOn={setGameOn} />
