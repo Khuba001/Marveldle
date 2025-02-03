@@ -1,10 +1,92 @@
-import { useEffect, useState } from "react";
-import md5 from "md5";
+import { use, useEffect, useState } from "react";
 import GameButton from "../../components/gamebutton/GameButton";
+
+const topCharacters = [
+  "Naruto Uzumaki",
+  "Sasuke Uchiha",
+  "Kakashi Hatake",
+  "Itachi Uchiha",
+  "Jiraiya",
+  "Madara Uchiha",
+  "Obito Uchiha",
+  "Minato Namikaze",
+  "Hashirama Senju",
+  "Tobirama Senju",
+  "Nagato",
+  "Hinata Hyūga",
+  "Gaara",
+  "Rock Lee",
+  "Neji Hyūga",
+  "Shikamaru Nara",
+  "Tsunade",
+  "Orochimaru",
+  "Hiruzen Sarutobi",
+  "Might Guy",
+  "Deidara",
+  "Kisame Hoshigaki",
+  "Sasori",
+  "Konan",
+  "Kaguya Ōtsutsuki",
+  "Sarada Uchiha",
+  "Mitsuki",
+  "Kankurō",
+  "Temari",
+  "Shisui Uchiha",
+  "Kabuto Yakushi",
+  "Chiyo",
+  "Zabuza Momochi",
+  "Haku",
+  "Yamato",
+  "Kurenai Yūhi",
+  "Anko Mitarashi",
+  "Danzō Shimura",
+  "Rin Nohara",
+  "Kushina Uzumaki",
+  "Iruka Umino",
+  "Killer B",
+  "Mei Terumī",
+  "Chōjūrō",
+  "Akamaru",
+  "Kiba Inuzuka",
+  "Sai",
+  "Toneri Ōtsutsuki",
+];
 
 function Main({ gameOn, setGameOn }) {
   // this state is responsible for guesses with each guess it increases by 1 and adds another row
-  const [guessArray, setGuessArray] = useState(["batmna", "sierla"]);
+  const [guessArray, setGuessArray] = useState([]);
+  const [allCharacters, setAllCharacters] = useState([]);
+  const [correctCharacterToday, setCorrectCharacterToday] = useState(null);
+
+  useEffect(function () {
+    async function fetchCharacters() {
+      try {
+        const res = await fetch(
+          "https://narutodb.xyz/api/character?page=1&limit=1431"
+        );
+        if (!res.ok)
+          throw new Error("Something went wrong with fetching the data");
+        const data = await res.json();
+        if (!data || !data.characters) {
+          throw new Error("Brak danych o postaciach!");
+        }
+        const fillteredCharacters = data.characters.filter((character) =>
+          topCharacters.includes(character.name)
+        );
+        setAllCharacters(fillteredCharacters);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchCharacters();
+  }, []);
+  useEffect(() => {
+    if (allCharacters.length > 0) {
+      setCorrectCharacterToday(
+        allCharacters[Math.floor(Math.random() * allCharacters.length)]
+      );
+    }
+  }, [allCharacters]);
   function playGame() {
     setGameOn(true);
   }
@@ -13,7 +95,11 @@ function Main({ gameOn, setGameOn }) {
       {!gameOn ? (
         <Menu onClick={playGame} />
       ) : (
-        <Game guessArray={guessArray} setGuessArray={setGuessArray} />
+        <Game
+          guessArray={guessArray}
+          correctCharacterToday={correctCharacterToday}
+          setGuessArray={setGuessArray}
+        />
       )}
     </div>
   );
@@ -24,14 +110,13 @@ export default Main;
 function Menu({ onClick }) {
   return (
     <div>
-      <h2 className="header">Guess Marvel Characters</h2>
-      <GameButton onClick={onClick} text={"Heroes"} bgColor={"#c6383f"} />
-      <GameButton text={"Villians"} bgColor={"#311141"} />{" "}
+      <h2 className="header">Guess Naruto Characters</h2>
+      <GameButton onClick={onClick} text={"Play"} bgColor={"#c6383f"} />
     </div>
   );
 }
 
-function Game({ guessArray, setGuessArray }) {
+function Game({ guessArray, setGuessArray, correctCharacterToday }) {
   const [query, setQuery] = useState("");
   const [guessedCharacter, setGuessedCharacter] = useState(null);
 
@@ -44,33 +129,26 @@ function Game({ guessArray, setGuessArray }) {
       return;
     }
     if (!guessArray.includes(`${query}`))
-      setGuessArray((guesses) => [...guesses, query]);
+      setGuessArray((guesses) => [...guesses, guessedCharacter]);
     setQuery("");
-    console.log(guessArray); // nie dodaje się
   }
-
-  const ts = Date.now().toString();
-  const hash = md5(
-    ts + process.env.REACT_APP_PRIVATE_KEY + process.env.REACT_APP_PUBLIC_KEY
-  );
 
   useEffect(
     function () {
       async function fetchAPI() {
         try {
+          if (!query) return;
           const res = await fetch(
-            `https://gateway.marvel.com/v1/public/characters?ts=${ts}&nameStartsWith=${query}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
+            `https://narutodb.xyz/api/character/search?name=${query}`
           );
 
           if (!res.ok)
             throw new Error("Something went wrong with fetching characters!");
-          const { data } = await res.json();
+          const data = await res.json();
+          console.log(data);
           if (data.Response === "False")
             throw new Error("Character not found!");
-          if (!data.results.length) throw new Error("Character not found!");
-
-          // console.log(data);
-          setGuessedCharacter(data.results[0]);
+          setGuessedCharacter(data);
         } catch (error) {
           console.error(error);
         }
@@ -96,38 +174,108 @@ function Game({ guessArray, setGuessArray }) {
       </div>
       {guessArray.map((guess) => (
         <GuessRow
-          guessArray={guessArray}
           guess={guess}
-          guessedCharacter={guessedCharacter}
           key={crypto.randomUUID()}
+          correctCharacterToday={correctCharacterToday}
         />
       ))}
     </div>
   );
 }
 
-function GuessRow({ guessArray, guessedCharacter }) {
-  // the guess prop will be compared to the answear
+function GuessRow({ guess, correctCharacterToday }) {
+  const dojutsuKekkeiGenkai = [
+    "Sharingan",
+    "Mangekyō Sharingan",
+    "Eternal Mangekyō Sharingan",
+    "Rinnegan",
+    "Rinne Sharingan",
+    "Byakugan",
+    "Tenseigan",
+    "Jōgan",
+  ];
+
+  const affIsCorrect = guess?.personal.affiliation.every((affiliation) =>
+    correctCharacterToday.personal.affiliation.includes(affiliation)
+  );
+
+  const elementIsCorrect = guess?.natureType.every((type) =>
+    correctCharacterToday.natureType.includes(type)
+  );
+
+  function determineKekkeiGenkai(character) {
+    if (!character?.personal?.kekkeiGenkai?.length) return "None";
+    if (
+      character?.personal?.kekkeiGenkai.some((jutsu) =>
+        dojutsuKekkeiGenkai.includes(jutsu)
+      )
+    )
+      return "Dojutsu";
+    return "Nature Transformation";
+  }
+
+  function compareKekkeiGenkai(guess, correct) {
+    const guessedType = determineKekkeiGenkai(guess);
+    const correctType = determineKekkeiGenkai(correct);
+    console.log(guessedType);
+    console.log(correctType);
+    return guessedType === correctType;
+  }
+  console.log(guess);
+  console.log(correctCharacterToday);
   return (
     <div className="guess-rows">
       <div></div>
+
       <div className="row-header">Gender</div>
-      <div className="row-header">Type</div>
-      <div className="row-header">Specie(s)</div>
-      <div className="row-header">Power Type(s)</div>
-      <div className="row-header">Origin</div>
-      <div className="row-header">Apparition year</div>
-      <img
-        src={`${guessedCharacter?.thumbnail?.path}.${guessedCharacter?.thumbnail?.extension}`}
-        alt="character portrait"
-        className="img"
-      />
-      <div className="row-text">Male</div>
-      <div className="row-text">Superhero</div>
-      <div className="row-text">Cyborg</div>
-      <div className="row-text">Strength</div>
-      <div className="row-text">Korbin</div>
-      <div className="row-text">1983</div>
+      <div className="row-header">Affiliations</div>
+      <div className="row-header">Clan</div>
+      <div className="row-header">Kekkei genkai</div>
+      <div className="row-header">Nature Type</div>
+      <div className="row-header">Debute Episode</div>
+      <img src={guess?.images[0]} alt="character portrait" className="img" />
+      <div
+        className={
+          !(correctCharacterToday?.personal?.sex === guess?.personal?.sex)
+            ? "row-text"
+            : "row-text complete"
+        }
+      >
+        {guess?.personal.sex}
+      </div>
+      <div className={!affIsCorrect ? "row-text" : "row-text complete"}>
+        {guess?.personal.affiliation}
+      </div>
+      <div
+        className={
+          !(correctCharacterToday?.personal?.clan === guess?.personal?.clan)
+            ? "row-text"
+            : "row-text complete"
+        }
+      >
+        {guess?.personal.clan}
+      </div>
+      <div
+        className={
+          compareKekkeiGenkai(guess, correctCharacterToday)
+            ? "row-text complete"
+            : "row-text"
+        }
+      >
+        {determineKekkeiGenkai(guess)}
+      </div>
+      <div className={!elementIsCorrect ? "row-text" : "row-text complete"}>
+        {guess?.natureType}
+      </div>
+      <div
+        className={
+          !(correctCharacterToday?.debut?.anime === guess?.debut?.anime)
+            ? "row-text"
+            : "row-text complete"
+        }
+      >
+        {guess?.debut.anime}
+      </div>
     </div>
   );
 }
