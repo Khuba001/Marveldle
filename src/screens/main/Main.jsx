@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import GameButton from "../../components/gamebutton/GameButton";
 
 const topCharacters = [
@@ -195,26 +195,45 @@ function GuessRow({ guess, correctCharacterToday }) {
     "Jōgan",
   ];
 
-  const affIsCorrect = guess?.personal.affiliation.every((affiliation) =>
-    correctCharacterToday.personal.affiliation.includes(affiliation)
-  );
+  const affIsCorrect =
+    Array.isArray(guess?.personal?.affiliation) &&
+    Array.isArray(correctCharacterToday?.personal?.affiliation) &&
+    guess.personal.affiliation.every((affiliation) =>
+      correctCharacterToday.personal.affiliation.includes(affiliation)
+    );
 
-  const elementIsCorrect = guess?.natureType.every((type) =>
-    correctCharacterToday.natureType.includes(type)
-  );
+  const elementIsCorrect =
+    Array.isArray(guess?.natureType) &&
+    Array.isArray(correctCharacterToday?.natureType) &&
+    guess.natureType.every((type) =>
+      correctCharacterToday.natureType.includes(type)
+    );
 
   function determineKekkeiGenkai(character) {
-    if (!character?.personal?.kekkeiGenkai?.length) return "None";
     if (
-      character?.personal?.kekkeiGenkai?.some((jutsu) =>
+      !character?.personal?.kekkeiGenkai ||
+      !Array.isArray(character.personal.kekkeiGenkai)
+    ) {
+      return "None";
+    }
+
+    if (character.personal.kekkeiGenkai.length === 0) {
+      return "None";
+    }
+
+    if (
+      character.personal.kekkeiGenkai.some((jutsu) =>
         dojutsuKekkeiGenkai.includes(jutsu)
       )
-    )
+    ) {
       return "Dojutsu";
+    }
+
     return "Nature Transformation";
   }
 
   function compareKekkeiGenkai(guess, correct) {
+    if (!guess || !correct) return false;
     const guessedType = determineKekkeiGenkai(guess);
     const correctType = determineKekkeiGenkai(correct);
     console.log(guessedType);
