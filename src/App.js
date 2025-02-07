@@ -1,4 +1,4 @@
-import Main from "./screens/main/Main";
+import Main from "./screens/Main";
 import NavBar from "./global/navbar/NavBar";
 import { useState } from "react";
 
