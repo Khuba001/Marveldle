@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import GameButton from "../../components/gamebutton/GameButton";
+import Fuse from "fuse.js";
 
 const topCharacters = [
   "Naruto Uzumaki",
@@ -67,9 +68,8 @@ function Main({ gameOn, setGameOn }) {
         if (!res.ok)
           throw new Error("Something went wrong with fetching the data");
         const data = await res.json();
-        if (!data || !data.characters) {
-          throw new Error("Brak danych o postaciach!");
-        }
+        if (!data.Response === "False") throw new Error("Characters not found");
+
         const fillteredCharacters = data.characters.filter((character) =>
           topCharacters.includes(character.name)
         );
@@ -99,6 +99,7 @@ function Main({ gameOn, setGameOn }) {
           guessArray={guessArray}
           correctCharacterToday={correctCharacterToday}
           setGuessArray={setGuessArray}
+          allCharacters={allCharacters}
         />
       )}
     </div>
@@ -116,48 +117,62 @@ function Menu({ onClick }) {
   );
 }
 
-function Game({ guessArray, setGuessArray, correctCharacterToday }) {
+function Game({
+  guessArray,
+  setGuessArray,
+  correctCharacterToday,
+  allCharacters,
+}) {
   const [query, setQuery] = useState("");
   const [guessedCharacter, setGuessedCharacter] = useState(null);
+  const [showSuggestions, setShowSugestions] = useState([]);
+
+  const fuse = new Fuse(allCharacters, {
+    keys: ["name"],
+    threshold: 0.1, // Im mniejsza wartość, tym dokładniejsze wyniki
+    includeScore: true,
+  });
 
   function handleChange(e) {
-    setQuery(e.target.value);
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value.length > 0) {
+      // const result = fuse.search(value).map(({ item }) => item);
+      const result = fuse.search(value).map(({ item }) => item);
+      setShowSugestions(result);
+    } else {
+      setShowSugestions([]);
+    }
   }
 
-  function handleSubmit() {
-    if (query.length < 3) {
+  async function handleSubmit() {
+    if (query.length < 2) {
       return;
     }
-    if (!guessArray.includes(`${query}`))
-      setGuessArray((guesses) => [...guesses, guessedCharacter]);
+
+    try {
+      const res = await fetch(
+        `https://narutodb.xyz/api/character/search?name=${query}`
+      );
+      if (!res.ok) throw new Error("Fetching Error");
+
+      const data = await res.json();
+
+      if (data.Response === "False") throw new Error("Character not found");
+
+      setGuessedCharacter(data);
+      setGuessArray((prev) => [...prev, data]);
+    } catch (err) {
+      console.error(err);
+    }
     setQuery("");
+    setShowSugestions([]);
   }
-
-  useEffect(
-    function () {
-      async function fetchAPI() {
-        try {
-          if (!query) return;
-          const res = await fetch(
-            `https://narutodb.xyz/api/character/search?name=${query}`
-          );
-
-          if (!res.ok)
-            throw new Error("Something went wrong with fetching characters!");
-          const data = await res.json();
-          console.log(data);
-          if (data.Response === "False")
-            throw new Error("Character not found!");
-          setGuessedCharacter(data);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      fetchAPI();
-    },
-    [query]
-  );
+  function handleSuggestionClick(name) {
+    setQuery(name);
+    setShowSugestions([]);
+  }
 
   return (
     <div className="game">
@@ -168,9 +183,23 @@ function Game({ guessArray, setGuessArray, correctCharacterToday }) {
           className="input-guess"
           type="text"
         />
+
         <button onClick={handleSubmit} type="submit" className="btn-guess">
           Guess
         </button>
+        {showSuggestions.length > 0 && (
+          <ul className="suggestions-container">
+            {showSuggestions.map((suggestion) => (
+              <li
+                onClick={() => handleSuggestionClick(suggestion.name)}
+                className="suggestions-row"
+                key={suggestion.id}
+              >
+                {suggestion.name}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       {guessArray.map((guess) => (
         <GuessRow
@@ -236,12 +265,10 @@ function GuessRow({ guess, correctCharacterToday }) {
     if (!guess || !correct) return false;
     const guessedType = determineKekkeiGenkai(guess);
     const correctType = determineKekkeiGenkai(correct);
-    console.log(guessedType);
-    console.log(correctType);
+
     return guessedType === correctType;
   }
-  console.log(guess);
-  console.log(correctCharacterToday);
+
   return (
     <div className="guess-rows">
       <div></div>
