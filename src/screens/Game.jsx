@@ -9,12 +9,11 @@ export default function Game({
   allCharacters,
 }) {
   const [query, setQuery] = useState("");
-  const [guessedCharacter, setGuessedCharacter] = useState(null);
   const [showSuggestions, setShowSugestions] = useState([]);
 
   const fuse = new Fuse(allCharacters, {
     keys: ["name"],
-    threshold: 0.1, // Im mniejsza wartość, tym dokładniejsze wyniki
+    threshold: 0.1,
     includeScore: true,
   });
 
@@ -46,7 +45,6 @@ export default function Game({
 
       if (data.Response === "False") throw new Error("Character not found");
 
-      setGuessedCharacter(data);
       setGuessArray((prev) => [...prev, data]);
     } catch (err) {
       console.error(err);
@@ -61,6 +59,7 @@ export default function Game({
 
   return (
     <div className="game">
+      {/* INPUT FIELD AND BUTTON */}
       <div className="guess-player-container">
         <input
           value={query}
@@ -72,6 +71,7 @@ export default function Game({
         <button onClick={handleSubmit} type="submit" className="btn-guess">
           Guess
         </button>
+        {/*SHOW SUGGESTIONS  */}
         {showSuggestions.length > 0 && (
           <ul className="suggestions-container">
             {showSuggestions.map((suggestion) => (
@@ -80,12 +80,18 @@ export default function Game({
                 className="suggestions-row"
                 key={suggestion.id}
               >
+                <img
+                  className="suggestion-img"
+                  src={suggestion.images[0]}
+                  alt=""
+                />{" "}
                 {suggestion.name}
               </li>
             ))}
           </ul>
         )}
       </div>
+      {/*GAME ROWS */}
       {guessArray.map((guess) => (
         <GuessRow
           guess={guess}

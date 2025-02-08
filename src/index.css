@@ -39,7 +39,7 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 5rem;
+  margin-top: 2rem;
   flex-direction: column;
   margin-bottom: 2rem;
 }
@@ -115,8 +115,16 @@ body,
   font-size: 18px;
   z-index: 10;
 }
+.suggestion-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 5px;
+}
 
 .suggestions-row {
+  display: flex;
+  align-items: center;
+
   padding: 8px 12px;
   cursor: pointer;
   transition: background 0.2s;
@@ -166,4 +174,11 @@ body,
 }
 .row-text.complete {
   background-color: green;
+}
+.row-text.affiliation,
+.row-text.affiliation.complete {
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
 }

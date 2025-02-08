@@ -9,7 +9,6 @@ function App() {
     <div className="app">
       <div></div>
       <div className="content">
-        {" "}
         <NavBar gameOn={gameOn} setGameOn={setGameOn} />
         <Main gameOn={gameOn} setGameOn={setGameOn} />
       </div>

@@ -75,9 +75,20 @@ export default function GuessRow({ guess, correctCharacterToday }) {
       >
         {guess?.personal.sex}
       </div>
-      <div className={!affIsCorrect ? "row-text" : "row-text complete"}>
-        {guess?.personal.affiliation}
-      </div>
+      <ul
+        className={
+          !affIsCorrect
+            ? "row-text affiliation"
+            : "row-text affiliation complete"
+        }
+      >
+        {guess?.personal.affiliation.slice(0, 3).map((aff, i, arr) => (
+          <li>
+            {/* if last element dont add comma */}
+            {!(i === arr.length - 1) ? <span>{aff},</span> : <span>{aff}</span>}
+          </li>
+        ))}
+      </ul>
       <div
         className={
           !(correctCharacterToday?.personal?.clan === guess?.personal?.clan)
