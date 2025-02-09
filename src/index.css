@@ -177,7 +177,8 @@ body,
 }
 .row-text.affiliation,
 .row-text.affiliation.complete {
-  font-size: 13px;
+  align-items: normal;
+  font-size: 10px;
   display: flex;
   flex-direction: column;
   list-style-type: none;

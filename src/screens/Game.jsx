@@ -30,6 +30,7 @@ export default function Game({
     }
   }
 
+  const controller = new AbortController();
   async function handleSubmit() {
     if (query.length < 2) {
       return;
@@ -37,7 +38,8 @@ export default function Game({
 
     try {
       const res = await fetch(
-        `https://narutodb.xyz/api/character/search?name=${query}`
+        `https://narutodb.xyz/api/character/search?name=${query}`,
+        { signal: controller.signal }
       );
       if (!res.ok) throw new Error("Fetching Error");
 
@@ -51,6 +53,9 @@ export default function Game({
     }
     setQuery("");
     setShowSugestions([]);
+    return function () {
+      controller.abort();
+    };
   }
   function handleSuggestionClick(name) {
     setQuery(name);
