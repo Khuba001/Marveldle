@@ -9,19 +9,19 @@ export default function GuessRow({ guess, correctCharacterToday }) {
     "Tenseigan",
     "Jōgan",
   ];
+  const natureTypes = [
+    "Earth Release",
+    "Fire Release",
+    "Lightning Release",
+    "Water Release",
+    "Wind Release",
+  ];
 
   const affIsCorrect =
     Array.isArray(guess?.personal?.affiliation) &&
     Array.isArray(correctCharacterToday?.personal?.affiliation) &&
     guess.personal.affiliation.every((affiliation) =>
       correctCharacterToday.personal.affiliation.includes(affiliation)
-    );
-
-  const elementIsCorrect =
-    Array.isArray(guess?.natureType) &&
-    Array.isArray(correctCharacterToday?.natureType) &&
-    guess.natureType.every((type) =>
-      correctCharacterToday.natureType.includes(type)
     );
 
   function determineKekkeiGenkai(character) {
@@ -54,6 +54,21 @@ export default function GuessRow({ guess, correctCharacterToday }) {
 
     return guessedType === correctType;
   }
+
+  //------------------------- ELEMENT TYPES-----------------------//
+
+  const cleanedNatureTypes =
+    guess.natureType &&
+    guess.natureType.map((type) => type.replace(/\s*\(.*?\)$/, ""));
+  const guessNatureTypes =
+    cleanedNatureTypes &&
+    cleanedNatureTypes.filter((type) => natureTypes.includes(type));
+  const elementIsCorrect =
+    Array.isArray(guessNatureTypes) &&
+    Array.isArray(correctCharacterToday?.natureType) &&
+    guessNatureTypes.every((type) =>
+      correctCharacterToday.natureType.includes(type)
+    );
 
   return (
     <div className="guess-rows">
@@ -107,13 +122,36 @@ export default function GuessRow({ guess, correctCharacterToday }) {
       >
         {determineKekkeiGenkai(guess)}
       </div>
-      <div className={!elementIsCorrect ? "row-text" : "row-text complete"}>
-        {guess?.natureType}
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}
+        className={!elementIsCorrect ? "row-text" : "row-text complete"}
+      >
+        {!guess.natureType ? (
+          <span
+            style={{
+              gridColumn: "2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            X
+          </span>
+        ) : (
+          guessNatureTypes.map((type) => (
+            <img
+              key={guess.id}
+              className="nature-type-logo"
+              src={`imgs/nature types/${type}.png`}
+              alt={`${type} icon`}
+            />
+          ))
+        )}
       </div>
       <div
         className={
           !(correctCharacterToday?.debut?.anime === guess?.debut?.anime)
-            ? "row-text"
+            ? "row-text "
             : "row-text complete"
         }
       >

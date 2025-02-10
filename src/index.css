@@ -183,3 +183,9 @@ body,
   flex-direction: column;
   list-style-type: none;
 }
+
+.nature-type-logo {
+  width: 24px;
+  align-self: center;
+  justify-self: center;
+}
