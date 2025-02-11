@@ -189,3 +189,36 @@ body,
   align-self: center;
   justify-self: center;
 }
+
+/* WIN SCREEN */
+.win-container {
+  background-color: #333;
+  width: 286px;
+  height: 286px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #f0f0f0;
+  font-size: 20px;
+  border-radius: 5px;
+  gap: 1rem;
+  z-index: 1;
+}
+
+.winner-img {
+  width: 168px;
+  border-radius: 5px;
+}
+.winner-name {
+  color: aquamarine;
+  font-weight: bold;
+}
+.winner-close {
+  position: absolute;
+  top: 4%;
+  font-weight: bold;
+  color: #e73c7e;
+  cursor: pointer;
+}

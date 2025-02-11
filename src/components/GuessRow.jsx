@@ -17,13 +17,6 @@ export default function GuessRow({ guess, correctCharacterToday }) {
     "Wind Release",
   ];
 
-  const affIsCorrect =
-    Array.isArray(guess?.personal?.affiliation) &&
-    Array.isArray(correctCharacterToday?.personal?.affiliation) &&
-    guess.personal.affiliation.every((affiliation) =>
-      correctCharacterToday.personal.affiliation.includes(affiliation)
-    );
-
   function determineKekkeiGenkai(character) {
     if (
       !character?.personal?.kekkeiGenkai ||
@@ -54,6 +47,24 @@ export default function GuessRow({ guess, correctCharacterToday }) {
 
     return guessedType === correctType;
   }
+
+  // ---------------------- AFFILIATION ----------------------//
+
+  const isAffiliationArray = Array.isArray(guess.personal.affiliation);
+
+  const charactersAffs = isAffiliationArray
+    ? guess.personal.affiliation.slice(0, 3)
+    : guess.personal.affiliation;
+
+  const affIsCorrect = guess.personal.affiliation
+    ? Array.isArray(guess?.personal?.affiliation) &&
+      Array.isArray(correctCharacterToday?.personal?.affiliation) &&
+      guess.personal.affiliation.every((affiliation) =>
+        correctCharacterToday.personal.affiliation.includes(affiliation)
+      )
+    : "None";
+
+  console.log(guess);
 
   //------------------------- ELEMENT TYPES-----------------------//
 
@@ -97,12 +108,19 @@ export default function GuessRow({ guess, correctCharacterToday }) {
             : "row-text affiliation complete"
         }
       >
-        {guess?.personal.affiliation.slice(0, 3).map((aff, i, arr) => (
-          <li>
-            {/* if last element dont add comma */}
-            {!(i === arr.length - 1) ? <span>{aff},</span> : <span>{aff}</span>}
-          </li>
-        ))}
+        {isAffiliationArray
+          ? charactersAffs.map((aff, i, arr) => (
+              <li>
+                {/* if last element dont add comma */}
+                {!(i === arr.length - 1) ? (
+                  <span>{aff},</span>
+                ) : (
+                  <span>{aff}</span>
+                )}
+              </li>
+            ))
+          : guess.personal.affiliation}
+        {charactersAffs.length === 1 && <li>charactersAffs[0]</li>}
       </ul>
       <div
         className={

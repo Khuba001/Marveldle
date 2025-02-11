@@ -1,6 +1,7 @@
 import Fuse from "fuse.js";
 import { useState } from "react";
 import GuessRow from "../components/GuessRow";
+import WinScreen from "../components/WinScreen";
 
 export default function Game({
   guessArray,
@@ -10,7 +11,8 @@ export default function Game({
 }) {
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSugestions] = useState([]);
-
+  const [gameWon, setGameWon] = useState(false);
+  const [closeScreen, setCloseScreen] = useState(false);
   const fuse = new Fuse(allCharacters, {
     keys: ["name"],
     threshold: 0.1,
@@ -60,6 +62,7 @@ export default function Game({
   function handleSuggestionClick(name) {
     setQuery(name);
     setShowSugestions([]);
+    if (name === correctCharacterToday.name) setGameWon(true);
   }
 
   return (
@@ -104,6 +107,12 @@ export default function Game({
           correctCharacterToday={correctCharacterToday}
         />
       ))}
+      {gameWon && !closeScreen && (
+        <WinScreen
+          winnerCharacter={correctCharacterToday}
+          onClick={setCloseScreen}
+        />
+      )}{" "}
     </div>
   );
 }
