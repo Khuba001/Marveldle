@@ -1,6 +1,8 @@
 export const topCharacters = [
   "Naruto Uzumaki",
   "Sasuke Uchiha",
+  "Sakura Haruno",
+  "Boruto Uzumaki",
   "Kakashi Hatake",
   "Itachi Uchiha",
   "Jiraiya",

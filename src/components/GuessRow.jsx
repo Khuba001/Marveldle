@@ -17,22 +17,24 @@ export default function GuessRow({ guess, correctCharacterToday }) {
     "Wind Release",
   ];
 
+  // ----------------------------------------- KEKKEI GENKAI ------------------------------------------ //
+
   function determineKekkeiGenkai(character) {
-    if (
-      !character?.personal?.kekkeiGenkai ||
-      !Array.isArray(character.personal.kekkeiGenkai)
-    ) {
-      return "None";
-    }
-
-    if (character.personal.kekkeiGenkai.length === 0) {
-      return "None";
-    }
+    if (!character.personal.kekkeiGenkai) return "None";
+    const isKekkeiGenkaiArray = Array.isArray(character.personal.kekkeiGenkai);
 
     if (
-      character.personal.kekkeiGenkai.some((jutsu) =>
-        dojutsuKekkeiGenkai.includes(jutsu)
+      isKekkeiGenkaiArray &&
+      character.personal.kekkeiGenkai.some((kekkeiGenkai) =>
+        dojutsuKekkeiGenkai.includes(kekkeiGenkai)
       )
+    ) {
+      return "Dojutsu";
+    }
+
+    if (
+      !isKekkeiGenkaiArray &&
+      dojutsuKekkeiGenkai.includes(character.personal.kekkeiGenkai)
     ) {
       return "Dojutsu";
     }
@@ -47,7 +49,6 @@ export default function GuessRow({ guess, correctCharacterToday }) {
 
     return guessedType === correctType;
   }
-
   // ---------------------- AFFILIATION ----------------------//
 
   const isAffiliationArray = Array.isArray(guess.personal.affiliation);
@@ -67,19 +68,23 @@ export default function GuessRow({ guess, correctCharacterToday }) {
   console.log(guess);
 
   //------------------------- ELEMENT TYPES-----------------------//
+  function formatNatureTypes(types) {
+    const cleanedNatureTypes =
+      types && types.map((type) => type.replace(/\s*\(.*?\)$/, ""));
 
-  const cleanedNatureTypes =
-    guess.natureType &&
-    guess.natureType.map((type) => type.replace(/\s*\(.*?\)$/, ""));
-  const guessNatureTypes =
-    cleanedNatureTypes &&
-    cleanedNatureTypes.filter((type) => natureTypes.includes(type));
-  const elementIsCorrect =
-    Array.isArray(guessNatureTypes) &&
-    Array.isArray(correctCharacterToday?.natureType) &&
-    guessNatureTypes.every((type) =>
-      correctCharacterToday.natureType.includes(type)
+    return (
+      cleanedNatureTypes &&
+      cleanedNatureTypes.filter((type) => natureTypes.includes(type))
     );
+  }
+
+  const elementIsCorrect =
+    Array.isArray(formatNatureTypes(guess.natureType)) &&
+    Array.isArray(formatNatureTypes(correctCharacterToday?.natureType)) &&
+    formatNatureTypes(correctCharacterToday.natureType).every((type) =>
+      formatNatureTypes(guess.natureType).includes(type)
+    );
+  console.log(elementIsCorrect);
 
   return (
     <div className="guess-rows">
@@ -129,7 +134,7 @@ export default function GuessRow({ guess, correctCharacterToday }) {
             : "row-text complete"
         }
       >
-        {guess?.personal.clan}
+        {guess.personal.clan ? <p>{guess.personal.clan}</p> : <p>None</p>}
       </div>
       <div
         className={
@@ -156,7 +161,7 @@ export default function GuessRow({ guess, correctCharacterToday }) {
             X
           </span>
         ) : (
-          guessNatureTypes.map((type) => (
+          formatNatureTypes(guess.natureType).map((type) => (
             <img
               key={guess.id}
               className="nature-type-logo"
