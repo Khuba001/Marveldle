@@ -6,7 +6,9 @@ function WinScreen({ winnerCharacter, onClick }) {
       <img className="winner-img" src={`${winnerCharacter.images[0]}`} alt="" />
       <p>
         Today's Character was{" "}
-        <span className="winner-name">{winnerCharacter.name}</span>
+        <p style={{ textAlign: "center" }} className="winner-name">
+          {winnerCharacter.name}
+        </p>
         <span className="winner-close" onClick={() => onClick(true)}>
           X
         </span>
